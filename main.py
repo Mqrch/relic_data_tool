@@ -161,6 +161,8 @@ def process_projections():
                 relic = export_relics[item_type]
                 era = relic.get("era", "Unknown")
                 category = relic.get("category", "Unknown")
+                quality = relic.get("quality", "Unknown")
+                radiant = quality == "VPQ_PLATINUM"
                 rewardManifest = relic.get("rewardManifest", "Unknown")
                 
                 # Get rewards from ExportRewards using rewardManifest
@@ -176,17 +178,22 @@ def process_projections():
                             item_name = resolve_reward_type(reward_type, export_recipes, export_weapons, export_resources, export_warframes, dict_en)
                             if item_name:
                                 if item_name not in relic_rewards_map:
-                                    relic_rewards_map[item_name] = 0
-                                relic_rewards_map[item_name] += item_count
+                                    relic_rewards_map[item_name] = {"radiant": 0, "regular": 0}
+                                if radiant:
+                                    relic_rewards_map[item_name]["radiant"] += item_count
+                                else:
+                                    relic_rewards_map[item_name]["regular"] += item_count
 
                 relic_info.append({
                     "itemType": item_type,
                     "itemCount": item_count,
                     "era": era,
                     "category": category,
+                    "quality": quality,
+                    "radiant": radiant,
                     "rewards": reward_types
                 })
-                print(f"Found relic match: {item_type} - Era: {era}, Category: {category}, Rewards: {len(reward_types)}")
+                print(f"Found relic match: {item_type} - Era: {era}, Category: {category}, Quality: {quality}, Radiant: {radiant}, Rewards: {len(reward_types)}")
             else:
                 print(f"No match found for: {item_type}")
         
@@ -322,9 +329,22 @@ def build_display_data():
             "resurgence": resurgence_dict
         }
         
-        # Get relic count if available
-        relic_count = relic_rewards_map.get(name, 0)
-        relic_suffix = f" [R:{relic_count}]" if relic_count > 0 else ""
+        # Get relic count if available (separated by radiant and regular)
+        relic_counts = relic_rewards_map.get(name, {"radiant": 0, "regular": 0})
+        radiant_count = relic_counts.get("radiant", 0) if isinstance(relic_counts, dict) else 0
+        regular_count = relic_counts.get("regular", 0) if isinstance(relic_counts, dict) else 0
+        total_count = radiant_count + regular_count
+        
+        # Build relic suffix showing radiant and regular counts separately
+        if total_count > 0:
+            if radiant_count > 0 and regular_count > 0:
+                relic_suffix = f" [I:{regular_count} | R:{radiant_count}]"
+            elif radiant_count > 0:
+                relic_suffix = f" [R:{radiant_count}]"
+            else:
+                relic_suffix = f" [I:{regular_count}]"
+        else:
+            relic_suffix = ""
         
         dots = '.' * (max_name_length - len(name))
         output_line = f"{name} {dots} {current_price:.2f} {resurgence_info}{relic_suffix}"
