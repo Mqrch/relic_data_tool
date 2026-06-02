@@ -81,7 +81,7 @@ def resolve_reward_type(reward_type, export_recipes, export_weapons, export_reso
         return None
 
 def process_projections():
-    """Process projections from inventory and save to relics.txt"""
+    """Process projections from inventory and map them to relic rewards"""
     global relic_rewards_map
     relic_rewards_map = {}  # Reset the map
     try:
@@ -190,11 +190,6 @@ def process_projections():
             else:
                 print(f"No match found for: {item_type}")
         
-        # Write to relics.txt
-        if relic_info:
-            with open("relics.txt", "w", encoding="utf-8") as f:
-                for info in relic_info:
-                    f.write(f"{info['era']} {info['category']} x{info['itemCount']}\n")
         print("End of the script.")
         
     except Exception as e:
@@ -342,10 +337,6 @@ def save_data():
     statistics_data = {name: price_list[name] for name in price_list}
     with open("data_list.json", "w", encoding="utf-8") as f:
         json.dump(statistics_data, f, indent=2)
-    
-    with open("data_list.txt", "w", encoding="utf-8") as f:
-        for name in sorted(enriched_data.keys(), key=lambda x: enriched_data[x]['price'], reverse=True):
-            f.write(f"{name}: {enriched_data[name]['price']:.2f}\n")
     
     with open("price_list.txt", "w", encoding="utf-8") as f:
         for name in sorted(enriched_data.keys(), key=lambda x: enriched_data[x]['price'], reverse=True):
