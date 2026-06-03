@@ -12,5 +12,11 @@ If your data is anywhere other than the default path, change the path in setting
 git clone https://github.com/Mqrch/relic_data_tool.git
 cd relic_data_tool
 ```
-2. Install dependencies: `pip install -r requirements.txt`
-3. Run main.py or compile the executable: `pyinstaller --onefile --windowed main.py`
+2. Install dependencies:
+```
+pip install -r requirements.txt
+```
+3. Run main.py or compile the executable:
+```
+pyinstaller --onefile --windowed main.py
+```
