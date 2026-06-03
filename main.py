@@ -74,6 +74,8 @@ def resolve_reward_type(reward_type, export_recipes, export_weapons, export_reso
             return None
         if item_name in dict_en:
             print(f"Translated item name: {item_name} -> {dict_en[item_name]}")
+            if dict_en[item_name].endswith(" Prime"):
+                return dict_en[item_name] + " Blueprint"
             return dict_en[item_name]
         return item_name
     except Exception as e:
@@ -247,7 +249,10 @@ def fetch_data_from_api(progress_callback=None):
     for item in data["data"]:
         if "tags" in item and "prime" in item.get("tags", []):
             if item.get("ducats") in [100, 65]:
-                prime_items[item["slug"]] = item["i18n"]["en"]["name"].removesuffix(" Blueprint")
+                en_item_name = item["i18n"]["en"]["name"].removesuffix(" Blueprint")
+                if en_item_name.endswith(" Prime"):
+                    en_item_name += " Blueprint"
+                prime_items[item["slug"]] = en_item_name
 
     total_items = len(prime_items)
     items_fetched = 0
