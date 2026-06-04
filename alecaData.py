@@ -30,7 +30,11 @@ def decrypt_last_data(lastdata_path=None, output_path=None):
         # 5. Decode the bytes to a UTF-8 string and parse into JSON object
         inventory_data = json.loads(raw_json_bytes.decode('utf-8'))
         
-        # 6. Save back to a beautifully formatted JSON file
+        # 6. Extract the actual inventory data from the InventoryJson field if it exists
+        if isinstance(inventory_data, dict) and "InventoryJson" in inventory_data:
+            inventory_data = json.loads(inventory_data["InventoryJson"])
+        
+        # 7. Save back to a beautifully formatted JSON file
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(inventory_data, f, indent=4)
             
